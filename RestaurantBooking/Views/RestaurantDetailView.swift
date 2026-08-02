@@ -236,6 +236,6 @@ struct FlowLayout: Layout {
         RestaurantDetailView(restaurant: PreviewFixtures.restaurant)
     }
     .environmentObject(AppStore())
-    .environmentObject(FirebaseAuthService())
+    .environmentObject(SessionStore())
     .environmentObject(ReservationRepository())
 }

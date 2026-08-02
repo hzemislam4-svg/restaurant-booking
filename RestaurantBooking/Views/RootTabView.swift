@@ -27,7 +27,7 @@ struct RootTabView: View {
 #Preview {
     RootTabView()
         .environmentObject(AppStore())
-        .environmentObject(FirebaseAuthService())
+        .environmentObject(SessionStore())
         .environmentObject(SubscriptionStore())
         .environmentObject(RestaurantRepository())
         .environmentObject(ReservationRepository())

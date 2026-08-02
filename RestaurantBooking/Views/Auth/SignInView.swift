@@ -6,116 +6,61 @@
 import SwiftUI
 
 struct SignInView: View {
-    @EnvironmentObject private var auth: FirebaseAuthService
-    @State private var email = ""
-    @State private var password = ""
-    @State private var goToSignUp = false
+    @EnvironmentObject private var auth: SessionStore
+    @State private var name = ""
+    @State private var role: UserRole = .diner
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: AppSpacing.lg) {
-                Spacer(minLength: AppSpacing.xl)
+        VStack(spacing: AppSpacing.lg) {
+            Spacer(minLength: AppSpacing.xl)
 
-                VStack(spacing: 6) {
-                    Image(systemName: "fork.knife.circle.fill")
-                        .font(.system(size: 52))
-                        .foregroundStyle(AppColor.accent)
-                    Text("مرحباً بعودتك")
-                        .font(.displayTitle)
-                    Text("سجّل الدخول لحجز طاولتك")
-                        .font(.subheadline)
-                        .foregroundStyle(AppColor.textSecondary)
-                }
-
-                VStack(spacing: AppSpacing.sm) {
-                    AppTextField(placeholder: "البريد الإلكتروني", text: $email, autocapitalize: false)
-                        .keyboardType(.emailAddress)
-                    AppSecureField(placeholder: "كلمة المرور", text: $password)
-                }
-
-                if let error = auth.errorMessage {
-                    Text(error)
-                        .font(.footnote)
-                        .foregroundStyle(AppColor.danger)
-                        .multilineTextAlignment(.center)
-                }
-
-                Button {
-                    Task { await auth.logIn(email: email, password: password) }
-                } label: {
-                    if auth.isLoading {
-                        ProgressView().tint(.white)
-                    } else {
-                        Text("تسجيل الدخول")
-                    }
-                }
-                .font(.headline)
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(AppColor.accent)
-                .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-                .disabled(email.isEmpty || password.isEmpty || auth.isLoading)
-                .opacity(email.isEmpty || password.isEmpty ? 0.5 : 1)
-
-                Spacer()
-
-                Button {
-                    auth.errorMessage = nil
-                    goToSignUp = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Text("ليس لديك حساب؟")
-                            .foregroundStyle(AppColor.textSecondary)
-                        Text("أنشئ حساباً")
-                            .foregroundStyle(AppColor.accent)
-                            .fontWeight(.semibold)
-                    }
+            VStack(spacing: 6) {
+                Image(systemName: "fork.knife.circle.fill")
+                    .font(.system(size: 52))
+                    .foregroundStyle(AppColor.accent)
+                Text("أهلاً بك")
+                    .font(.displayTitle)
+                Text("اكتب اسمك وادخل مباشرة")
                     .font(.subheadline)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
+
+            VStack(spacing: AppSpacing.sm) {
+                TextField("اسمك", text: $name)
+                    .padding(.horizontal, AppSpacing.md)
+                    .padding(.vertical, 14)
+                    .background(AppColor.secondaryBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+
+                Picker("الدور", selection: $role) {
+                    Text("زبون").tag(UserRole.diner)
+                    Text("صاحب مطعم").tag(UserRole.owner)
                 }
-                .padding(.bottom, AppSpacing.md)
+                .pickerStyle(.segmented)
             }
-            .padding(.horizontal, AppSpacing.lg)
-            .background(AppColor.background)
-            .navigationDestination(isPresented: $goToSignUp) {
-                SignUpView()
+
+            Button {
+                auth.logIn(name: name, role: role)
+            } label: {
+                Text("دخول")
             }
+            .font(.headline)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(AppColor.accent)
+            .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+            .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
+            .opacity(name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
+
+            Spacer()
         }
-    }
-}
-
-/// Shared plain text field styling used by both auth screens.
-struct AppTextField: View {
-    let placeholder: String
-    @Binding var text: String
-    var autocapitalize: Bool = true
-
-    var body: some View {
-        TextField(placeholder, text: $text)
-            .textInputAutocapitalization(autocapitalize ? .words : .never)
-            .autocorrectionDisabled()
-            .padding(.horizontal, AppSpacing.md)
-            .padding(.vertical, 14)
-            .background(AppColor.secondaryBackground)
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-    }
-}
-
-/// Shared secure field styling used by both auth screens.
-struct AppSecureField: View {
-    let placeholder: String
-    @Binding var text: String
-
-    var body: some View {
-        SecureField(placeholder, text: $text)
-            .padding(.horizontal, AppSpacing.md)
-            .padding(.vertical, 14)
-            .background(AppColor.secondaryBackground)
-            .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+        .padding(.horizontal, AppSpacing.lg)
+        .background(AppColor.background)
     }
 }
 
 #Preview {
     SignInView()
-        .environmentObject(FirebaseAuthService())
+        .environmentObject(SessionStore())
 }

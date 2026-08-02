@@ -7,7 +7,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject private var favorites: AppStore
-    @EnvironmentObject private var auth: FirebaseAuthService
+    @EnvironmentObject private var auth: SessionStore
     @EnvironmentObject private var subscriptions: SubscriptionStore
     @EnvironmentObject private var restaurantRepo: RestaurantRepository
     @EnvironmentObject private var reservationRepo: ReservationRepository
@@ -183,7 +183,7 @@ struct ProfileView: View {
 #Preview {
     ProfileView()
         .environmentObject(AppStore())
-        .environmentObject(FirebaseAuthService())
+        .environmentObject(SessionStore())
         .environmentObject(SubscriptionStore())
         .environmentObject(RestaurantRepository())
         .environmentObject(ReservationRepository())

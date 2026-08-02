@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct MyRestaurantView: View {
-    @EnvironmentObject private var auth: FirebaseAuthService
+    @EnvironmentObject private var auth: SessionStore
     @EnvironmentObject private var subscriptions: SubscriptionStore
     @EnvironmentObject private var restaurantRepo: RestaurantRepository
 
@@ -131,7 +131,7 @@ struct MyRestaurantView: View {
 
 #Preview {
     MyRestaurantView()
-        .environmentObject(FirebaseAuthService())
+        .environmentObject(SessionStore())
         .environmentObject(SubscriptionStore())
         .environmentObject(RestaurantRepository())
 }

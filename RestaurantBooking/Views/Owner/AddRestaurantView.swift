@@ -11,7 +11,7 @@ import SwiftUI
 import PhotosUI
 
 struct AddRestaurantView: View {
-    @EnvironmentObject private var auth: FirebaseAuthService
+    @EnvironmentObject private var auth: SessionStore
     @EnvironmentObject private var restaurantRepo: RestaurantRepository
     @Environment(\.dismiss) private var dismiss
 
@@ -179,6 +179,6 @@ struct AddRestaurantView: View {
 
 #Preview {
     AddRestaurantView()
-        .environmentObject(FirebaseAuthService())
+        .environmentObject(SessionStore())
         .environmentObject(RestaurantRepository())
 }

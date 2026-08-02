@@ -12,7 +12,7 @@
 import SwiftUI
 
 struct BookingView: View {
-    @EnvironmentObject private var auth: FirebaseAuthService
+    @EnvironmentObject private var auth: SessionStore
     @EnvironmentObject private var reservationRepo: ReservationRepository
     @Environment(\.dismiss) private var dismiss
 
@@ -218,6 +218,6 @@ struct BookingView: View {
 
 #Preview {
     BookingView(restaurant: PreviewFixtures.restaurant)
-        .environmentObject(FirebaseAuthService())
+        .environmentObject(SessionStore())
         .environmentObject(ReservationRepository())
 }
