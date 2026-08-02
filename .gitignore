@@ -1,0 +1,23 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+*.xcodeproj
+!project.yml
+
+# Swift Package Manager
+.build/
+.swiftpm/
+*.resolved
+
+# IPA
+dist-ipa/
+
+# Environment
+*.xcconfig
+!Config/Debug.xcconfig
+!Config/Release.xcconfig
+
+# macOS
+.DS_Store
