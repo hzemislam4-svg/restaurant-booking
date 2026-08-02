@@ -1,8 +1,14 @@
+//
+//  RestaurantBookingApp.swift
+//  RestaurantBooking
+//
+//  App entry point.
+//
+
 import SwiftUI
 
 @main
 struct RestaurantBookingApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var store = AppStore()
 
     init() {
@@ -14,7 +20,7 @@ struct RestaurantBookingApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootTabView()
                 .environmentObject(store)
                 .environment(\.layoutDirection, .rightToLeft)
                 .preferredColorScheme(.dark)

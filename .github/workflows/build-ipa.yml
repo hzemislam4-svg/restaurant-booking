@@ -21,25 +21,6 @@ jobs:
         run: |
           brew install xcodegen
 
-      - name: Configure Google keys
-        run: |
-          set -e
-          MAPS_KEY="${GOOGLE_MAPS_API_KEY:-YOUR_MAPS_API_KEY}"
-          CLIENT_ID="${GOOGLE_CLIENT_ID:-com.restaurantbooking.apps.googleusercontent.com}"
-
-          # احسب المعكوس: com.googleusercontent.apps.<الرقم>
-          NUMERIC="${CLIENT_ID%%.*}"
-          REVERSED="com.googleusercontent.apps.${NUMERIC}"
-
-          for cfg in Config/Debug.xcconfig Config/Release.xcconfig; do
-            sed -i '' "s|^GOOGLE_MAPS_API_KEY = .*|GOOGLE_MAPS_API_KEY = ${MAPS_KEY}|" "$cfg"
-            sed -i '' "s|^GOOGLE_CLIENT_ID = .*|GOOGLE_CLIENT_ID = ${CLIENT_ID}|" "$cfg"
-            sed -i '' "s|^GOOGLE_REVERSED_CLIENT_ID = .*|GOOGLE_REVERSED_CLIENT_ID = ${REVERSED}|" "$cfg"
-          done
-        env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-
       - name: Generate Xcode project
         run: xcodegen generate
 
