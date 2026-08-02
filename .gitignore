@@ -21,3 +21,5 @@ dist-ipa/
 
 # macOS
 .DS_Store
+
+*.ipa
