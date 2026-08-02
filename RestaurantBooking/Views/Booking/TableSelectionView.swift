@@ -12,7 +12,7 @@ struct TableSelectionView: View {
                 HStack(spacing: 10) {
                     IconBackButton { store.flow = .booking(restaurant) }
                     Text("اختر طاولتك")
-                        .font(.custom(Theme.fontName, size: 17, weight: .bold))
+                        .font(.appFont(17, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                     Spacer()
                 }
@@ -20,7 +20,7 @@ struct TableSelectionView: View {
                 .padding(.vertical, 8)
 
                 Text("\(dateLabel) · \(store.selectedTime ?? "") · \(store.guests) أشخاص")
-                    .font(.custom(Theme.fontName, size: 12))
+                    .font(.appFont(12))
                     .foregroundStyle(Theme.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .trailing)
                     .padding(.horizontal, 20)
@@ -108,7 +108,7 @@ struct TableCircleView: View {
     var body: some View {
         Button(action: action) {
             Text("\(table.seats)")
-                .font(.custom(Theme.fontName, size: 12, weight: .medium))
+                .font(.appFont(12, weight: .medium))
                 .foregroundStyle(foreground)
                 .frame(width: table.circleSize, height: table.circleSize)
                 .background(Circle().fill(background))
@@ -146,7 +146,7 @@ struct LegendDot: View {
                 .frame(width: 9, height: 9)
                 .overlay(Circle().stroke(border))
             Text(label)
-                .font(.custom(Theme.fontName, size: 11))
+                .font(.appFont(11))
                 .foregroundStyle(Theme.textSecondary)
         }
     }

@@ -26,13 +26,13 @@ struct LoginView: View {
             .padding(.bottom, 20)
 
             Text("تسجيل الدخول")
-                .font(.custom(Theme.fontName, size: 24, weight: .bold))
+                .font(.appFont(24, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.bottom, 4)
 
             Text("سجّل دخولك لإدارة حجوزاتك ومفضلتك")
-                .font(.custom(Theme.fontName, size: 13))
+                .font(.appFont(13))
                 .foregroundStyle(Theme.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.bottom, 20)
@@ -40,10 +40,10 @@ struct LoginView: View {
             VStack(spacing: 14) {
                 VStack(alignment: .trailing, spacing: 6) {
                     Text("رقم الجوال أو البريد الإلكتروني")
-                        .font(.custom(Theme.fontName, size: 13, weight: .medium))
+                        .font(.appFont(13, weight: .medium))
                         .foregroundStyle(Theme.textPrimary)
                     TextField("05xxxxxxxx", text: $identifier)
-                        .font(.custom(Theme.fontName, size: 14))
+                        .font(.appFont(14))
                         .foregroundStyle(Theme.textPrimary)
                         .padding(12)
                         .background(
@@ -55,10 +55,10 @@ struct LoginView: View {
 
                 VStack(alignment: .trailing, spacing: 6) {
                     Text("كلمة المرور")
-                        .font(.custom(Theme.fontName, size: 13, weight: .medium))
+                        .font(.appFont(13, weight: .medium))
                         .foregroundStyle(Theme.textPrimary)
                     SecureField("••••••••", text: $password)
-                        .font(.custom(Theme.fontName, size: 14))
+                        .font(.appFont(14))
                         .foregroundStyle(Theme.textPrimary)
                         .padding(12)
                         .background(
@@ -104,7 +104,7 @@ struct LoginView: View {
                                 GoogleIconView()
                             }
                             Text(isGoogleLoading ? "جارٍ الاتصال بجوجل..." : "المتابعة عبر جوجل")
-                                .font(.custom(Theme.fontName, size: 15, weight: .bold))
+                                .font(.appFont(15, weight: .bold))
                         }
                         .foregroundStyle(Theme.textPrimary)
                         .frame(maxWidth: .infinity)
@@ -122,7 +122,7 @@ struct LoginView: View {
                     store.flow = nil
                 } label: {
                     Text("المتابعة كزائر")
-                        .font(.custom(Theme.fontName, size: 12))
+                        .font(.appFont(12))
                         .foregroundStyle(store.accentColor)
                 }
                 .buttonStyle(.plain)

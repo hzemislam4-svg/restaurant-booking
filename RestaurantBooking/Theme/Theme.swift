@@ -55,6 +55,25 @@ enum Theme {
     static let radiusSm: CGFloat = 10
 }
 
+extension Font {
+    static func appFont(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
+        let name: String
+        switch weight {
+        case .bold, .heavy, .black:
+            name = "Tajawal-Bold"
+        case .medium, .semibold:
+            name = "Tajawal-Medium"
+        default:
+            name = "Tajawal"
+        }
+        return Font.custom(name, size: size)
+    }
+
+    static func appFont(_ size: CGFloat, relativeTo style: Font.TextStyle) -> Font {
+        Font.custom("Tajawal", size: size, relativeTo: style)
+    }
+}
+
 enum AccentTheme: String, CaseIterable, Identifiable {
     case tomato = "طماطمي"
     case amber = "كهرماني"

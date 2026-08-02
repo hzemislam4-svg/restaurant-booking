@@ -56,7 +56,7 @@ struct RestaurantDetailView: View {
     private var info: some View {
         VStack(alignment: .trailing, spacing: 0) {
             Text(restaurant.name)
-                .font(.custom(Theme.fontName, size: 22, weight: .bold))
+                .font(.appFont(22, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.bottom, 6)
@@ -69,14 +69,14 @@ struct RestaurantDetailView: View {
             .padding(.bottom, 8)
 
             Text("\(restaurant.area) · \(restaurant.distance)")
-                .font(.custom(Theme.fontName, size: 12))
+                .font(.appFont(12))
                 .foregroundStyle(Theme.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
             HStack(spacing: 4) {
                 StarRatingView(rating: restaurant.rating)
                 Text("(\(restaurant.reviewCount) تقييم)")
-                    .font(.custom(Theme.fontName, size: 12))
+                    .font(.appFont(12))
                     .foregroundStyle(Theme.textSecondary)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -89,14 +89,14 @@ struct RestaurantDetailView: View {
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.textSecondary)
                 Text(restaurant.hours)
-                    .font(.custom(Theme.fontName, size: 12.5))
+                    .font(.appFont(12.5))
                     .foregroundStyle(Theme.textSecondary)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.vertical, 14)
 
             Text(restaurant.description)
-                .font(.custom(Theme.fontName, size: 13))
+                .font(.appFont(13))
                 .foregroundStyle(Theme.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.bottom, 16)
@@ -109,7 +109,7 @@ struct RestaurantDetailView: View {
 
             HStack {
                 Text("التقييمات")
-                    .font(.custom(Theme.fontName, size: 17, weight: .bold))
+                    .font(.appFont(17, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
                 StarRatingView(rating: restaurant.rating)
@@ -132,14 +132,14 @@ struct ReviewCard: View {
         VStack(alignment: .trailing, spacing: 6) {
             HStack(spacing: 8) {
                 Text(review.initial)
-                    .font(.custom(Theme.fontName, size: 13, weight: .bold))
+                    .font(.appFont(13, weight: .bold))
                     .foregroundStyle(Theme.accent)
                     .frame(width: 30, height: 30)
                     .background(Theme.accent.opacity(0.15))
                     .clipShape(Circle())
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(review.name)
-                        .font(.custom(Theme.fontName, size: 13))
+                        .font(.appFont(13))
                         .foregroundStyle(Theme.textPrimary)
                     Text(review.starsStr)
                         .font(.system(size: 11))
@@ -147,11 +147,11 @@ struct ReviewCard: View {
                 }
                 Spacer()
                 Text(review.date)
-                    .font(.custom(Theme.fontName, size: 11))
+                    .font(.appFont(11))
                     .foregroundStyle(Theme.textMuted)
             }
             Text(review.comment)
-                .font(.custom(Theme.fontName, size: 12.5))
+                .font(.appFont(12.5))
                 .foregroundStyle(Theme.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }

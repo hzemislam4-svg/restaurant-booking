@@ -17,7 +17,7 @@ struct BookingConfirmationView: View {
                 HStack(spacing: 10) {
                     IconBackButton { store.flow = .tableSelection(restaurant) }
                     Text("تأكيد الحجز")
-                        .font(.custom(Theme.fontName, size: 17, weight: .bold))
+                        .font(.appFont(17, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                     Spacer()
                 }
@@ -27,7 +27,7 @@ struct BookingConfirmationView: View {
                 VStack(spacing: 0) {
                     VStack(spacing: 12) {
                         Text("ملخص الحجز")
-                            .font(.custom(Theme.fontName, size: 12, weight: .medium))
+                            .font(.appFont(12, weight: .medium))
                             .foregroundStyle(Theme.accent)
                             .frame(maxWidth: .infinity, alignment: .trailing)
                         InfoRow(label: "المطعم", value: restaurant.name)
@@ -43,7 +43,7 @@ struct BookingConfirmationView: View {
                     )
 
                     Text("طلب الطعام مسبقاً سيتوفر لاحقاً — هذا الحجز يضمن مقعدك فقط.")
-                        .font(.custom(Theme.fontName, size: 12))
+                        .font(.appFont(12))
                         .foregroundStyle(Theme.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.vertical, 14)

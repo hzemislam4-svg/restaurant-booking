@@ -45,16 +45,16 @@ struct HomeView: View {
                     Image(systemName: "mappin.and.ellipse")
                         .font(.system(size: 12))
                     Text("المدينة")
-                        .font(.custom(Theme.fontName, size: 11))
+                        .font(.appFont(11))
                 }
                 .foregroundStyle(Theme.textSecondary)
 
                 Text("أين تريد أن تأكل اليوم؟")
-                    .font(.custom(Theme.fontName, size: 20, weight: .bold))
+                    .font(.appFont(20, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
 
                 Text("اختر مطعماً واحجز مقعدك خلال ثوانٍ")
-                    .font(.custom(Theme.fontName, size: 12))
+                    .font(.appFont(12))
                     .foregroundStyle(Theme.textSecondary)
 
                 searchField
@@ -69,7 +69,7 @@ struct HomeView: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Theme.textSecondary)
             TextField("ابحث عن مطعم أو نوع مطبخ", text: $store.search)
-                .font(.custom(Theme.fontName, size: 13))
+                .font(.appFont(13))
                 .foregroundStyle(Theme.textPrimary)
         }
         .padding(.horizontal, 16)
@@ -98,13 +98,13 @@ struct HomeView: View {
 
     private var layoutSegments: some View {
         HStack(spacing: 4) {
-            ForEach(HomeLayout.allCases, id: \.self) { layout in
+            ForEach(HomeLayout.allCases) { layout in
                 let selected = store.homeLayout == layout
                 Button {
                     store.homeLayout = layout
                 } label: {
                     Text(layout.rawValue)
-                        .font(.custom(Theme.fontName, size: 13, weight: selected ? .bold : .regular))
+                        .font(.appFont(13, weight: selected ? .bold : .regular))
                         .foregroundStyle(selected ? Theme.textPrimary : Theme.textSecondary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
@@ -184,11 +184,11 @@ struct RestaurantGridCard: View {
                 .padding(6)
             }
             Text(restaurant.name)
-                .font(.custom(Theme.fontName, size: 14, weight: .medium))
+                .font(.appFont(14, weight: .medium))
                 .foregroundStyle(Theme.textPrimary)
                 .lineLimit(1)
             Text("\(restaurant.cuisine) · \(restaurant.area)")
-                .font(.custom(Theme.fontName, size: 11))
+                .font(.appFont(11))
                 .foregroundStyle(Theme.textSecondary)
                 .lineLimit(1)
             StarRatingView(rating: restaurant.rating)
@@ -218,18 +218,18 @@ struct RestaurantListCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14))
             VStack(alignment: .leading, spacing: 3) {
                 Text(restaurant.name)
-                    .font(.custom(Theme.fontName, size: compact ? 13 : 14, weight: .medium))
+                    .font(.appFont(compact ? 13 : 14, weight: .medium))
                     .foregroundStyle(Theme.textPrimary)
                     .lineLimit(1)
                 Text("\(restaurant.cuisine) · \(restaurant.area) · \(restaurant.distance)")
-                    .font(.custom(Theme.fontName, size: 11))
+                    .font(.appFont(11))
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(1)
                 HStack(spacing: 6) {
                     StarRatingView(rating: restaurant.rating)
                     if !compact {
                         Text(restaurant.price)
-                            .font(.custom(Theme.fontName, size: 11))
+                            .font(.appFont(11))
                             .foregroundStyle(Theme.textSecondary)
                     }
                 }
@@ -274,10 +274,10 @@ struct FeaturedCard: View {
             VStack(alignment: .leading, spacing: 5) {
                 TagView(text: "الأعلى تقييماً", accent: true)
                 Text(restaurant.name)
-                    .font(.custom(Theme.fontName, size: 16, weight: .bold))
+                    .font(.appFont(16, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                 Text("\(restaurant.cuisine) · \(restaurant.area) · ★ \(restaurant.ratingStr) · \(restaurant.distance)")
-                    .font(.custom(Theme.fontName, size: 11))
+                    .font(.appFont(11))
                     .foregroundStyle(Theme.textSecondary)
             }
             .padding(12)

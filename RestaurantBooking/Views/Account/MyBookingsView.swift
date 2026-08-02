@@ -6,7 +6,7 @@ struct MyBookingsView: View {
     var body: some View {
         VStack(alignment: .trailing, spacing: 14) {
             Text("حجوزاتي")
-                .font(.custom(Theme.fontName, size: 20, weight: .bold))
+                .font(.appFont(20, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.top, 4)
@@ -15,7 +15,7 @@ struct MyBookingsView: View {
                 Spacer()
                 VStack(spacing: 12) {
                     Text("لا توجد حجوزات بعد")
-                        .font(.custom(Theme.fontName, size: 13))
+                        .font(.appFont(13))
                         .foregroundStyle(Theme.textSecondary)
                     PrimaryButton(title: "تصفح المطاعم", accentColor: store.accentColor) {
                         store.tab = .home
@@ -49,13 +49,13 @@ struct BookingRow: View {
         VStack(alignment: .trailing, spacing: 8) {
             HStack {
                 Text(booking.restaurantName)
-                    .font(.custom(Theme.fontName, size: 15, weight: .medium))
+                    .font(.appFont(15, weight: .medium))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
                 TagView(text: booking.statusLabel, accent: booking.status == .upcoming)
             }
             Text("\(booking.date) · \(booking.time) · \(booking.guests) أشخاص")
-                .font(.custom(Theme.fontName, size: 12))
+                .font(.appFont(12))
                 .foregroundStyle(Theme.textSecondary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
 
@@ -66,7 +66,7 @@ struct BookingRow: View {
                         store.cancelBooking(booking.id)
                     } label: {
                         Text("إلغاء الحجز")
-                            .font(.custom(Theme.fontName, size: 12, weight: .medium))
+                            .font(.appFont(12, weight: .medium))
                             .foregroundStyle(Theme.danger)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 7)

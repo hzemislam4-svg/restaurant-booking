@@ -15,13 +15,13 @@ struct MembershipView: View {
 
                 VStack(alignment: .trailing, spacing: 0) {
                     Text("العضوية المميزة")
-                        .font(.custom(Theme.fontName, size: 24, weight: .bold))
+                        .font(.appFont(24, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.bottom, 4)
 
                     Text("أولوية في الحجز، بدون رسوم إلغاء، وطاولات حصرية")
-                        .font(.custom(Theme.fontName, size: 13))
+                        .font(.appFont(13))
                         .foregroundStyle(Theme.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.bottom, 18)
@@ -34,13 +34,13 @@ struct MembershipView: View {
                             } label: {
                                 VStack(alignment: .trailing, spacing: 4) {
                                     Text(plan.label)
-                                        .font(.custom(Theme.fontName, size: 13))
+                                        .font(.appFont(13))
                                         .foregroundStyle(Theme.textPrimary)
                                     Text(plan.price)
-                                        .font(.custom(Theme.fontName, size: 20, weight: .bold))
+                                        .font(.appFont(20, weight: .bold))
                                         .foregroundStyle(Theme.textPrimary)
                                     Text(plan.period)
-                                        .font(.custom(Theme.fontName, size: 11))
+                                        .font(.appFont(11))
                                         .foregroundStyle(Theme.textSecondary)
                                     if let badge = plan.badge {
                                         TagView(text: badge, accent: true)
@@ -89,7 +89,7 @@ struct MembershipView: View {
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(Theme.success)
             Text(text)
-                .font(.custom(Theme.fontName, size: 13))
+                .font(.appFont(13))
                 .foregroundStyle(Theme.textPrimary)
         }
         .frame(maxWidth: .infinity, alignment: .trailing)

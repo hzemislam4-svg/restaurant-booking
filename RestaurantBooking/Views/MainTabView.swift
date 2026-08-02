@@ -49,7 +49,7 @@ struct FloatingTabBar: View {
                         Image(systemName: item.2)
                             .font(.system(size: 17))
                         Text(item.1)
-                            .font(.custom(Theme.fontName, size: 9))
+                            .font(.appFont(9))
                     }
                     .foregroundStyle(isSelected ? accentColor : Theme.textSecondary)
                     .padding(.horizontal, 14)

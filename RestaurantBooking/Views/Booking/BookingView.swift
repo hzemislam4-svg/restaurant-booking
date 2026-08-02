@@ -10,7 +10,7 @@ struct BookingView: View {
                 HStack(spacing: 10) {
                     IconBackButton { store.flow = .detail(restaurant) }
                     Text("تفاصيل الحجز")
-                        .font(.custom(Theme.fontName, size: 17, weight: .bold))
+                        .font(.appFont(17, weight: .bold))
                         .foregroundStyle(Theme.textPrimary)
                     Spacer()
                 }
@@ -39,7 +39,7 @@ struct BookingView: View {
     private var dateField: some View {
         VStack(alignment: .trailing, spacing: 8) {
             Text("التاريخ")
-                .font(.custom(Theme.fontName, size: 13, weight: .medium))
+                .font(.appFont(13, weight: .medium))
                 .foregroundStyle(Theme.textPrimary)
             DatePicker("", selection: $store.selectedDate,
                        in: Date()...,
@@ -60,7 +60,7 @@ struct BookingView: View {
     private var guestsField: some View {
         VStack(alignment: .trailing, spacing: 8) {
             Text("عدد الأشخاص")
-                .font(.custom(Theme.fontName, size: 13, weight: .medium))
+                .font(.appFont(13, weight: .medium))
                 .foregroundStyle(Theme.textPrimary)
             HStack(spacing: 14) {
                 Button {
@@ -76,7 +76,7 @@ struct BookingView: View {
                 .buttonStyle(.plain)
 
                 Text("\(store.guests)")
-                    .font(.custom(Theme.fontName, size: 18, weight: .bold))
+                    .font(.appFont(18, weight: .bold))
                     .foregroundStyle(Theme.textPrimary)
                     .frame(minWidth: 24)
 
@@ -99,7 +99,7 @@ struct BookingView: View {
     private var timeField: some View {
         VStack(alignment: .trailing, spacing: 8) {
             Text("اختر الوقت")
-                .font(.custom(Theme.fontName, size: 13, weight: .medium))
+                .font(.appFont(13, weight: .medium))
                 .foregroundStyle(Theme.textPrimary)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 80), spacing: 8)], spacing: 8) {
                 ForEach(MockData.timeSlots, id: \.self) { slot in

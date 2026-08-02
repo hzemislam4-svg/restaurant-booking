@@ -104,8 +104,10 @@ final class AppStore: ObservableObject {
     }
 }
 
-enum HomeLayout: String, CaseIterable {
+enum HomeLayout: String, CaseIterable, Identifiable {
     case grid = "شبكة"
     case list = "قائمة"
     case featured = "مميز"
+
+    var id: String { rawValue }
 }

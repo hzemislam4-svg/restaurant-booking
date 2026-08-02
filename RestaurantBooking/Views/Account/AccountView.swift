@@ -17,14 +17,14 @@ struct AccountView: View {
     private var accountContent: some View {
         VStack(alignment: .trailing, spacing: 0) {
             Text("حسابي")
-                .font(.custom(Theme.fontName, size: 24, weight: .bold))
+                .font(.appFont(24, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.bottom, 18)
 
             HStack(spacing: 12) {
                 Text(store.user.initial.isEmpty ? "؟" : store.user.initial)
-                    .font(.custom(Theme.fontName, size: 20, weight: .bold))
+                    .font(.appFont(20, weight: .bold))
                     .foregroundStyle(Theme.accent)
                     .frame(width: 56, height: 56)
                     .background(Theme.accent.opacity(0.15))
@@ -32,10 +32,10 @@ struct AccountView: View {
 
                 VStack(alignment: .trailing, spacing: 3) {
                     Text(store.user.name.isEmpty ? "زائر" : store.user.name)
-                        .font(.custom(Theme.fontName, size: 16, weight: .medium))
+                        .font(.appFont(16, weight: .medium))
                         .foregroundStyle(Theme.textPrimary)
                     Text(store.user.phone.isEmpty ? (store.user.email.isEmpty ? "غير مسجل" : store.user.email) : store.user.phone)
-                        .font(.custom(Theme.fontName, size: 12))
+                        .font(.appFont(12))
                         .foregroundStyle(Theme.textSecondary)
                 }
                 Spacer()
@@ -66,7 +66,7 @@ struct AccountView: View {
 
             VStack(alignment: .trailing, spacing: 8) {
                 Text("اختر لون التطبيق")
-                    .font(.custom(Theme.fontName, size: 12))
+                    .font(.appFont(12))
                     .foregroundStyle(Theme.textSecondary)
                 HStack(spacing: 12) {
                     ForEach(AccentTheme.allCases) { theme in

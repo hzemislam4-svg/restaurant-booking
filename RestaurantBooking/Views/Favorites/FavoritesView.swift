@@ -6,7 +6,7 @@ struct FavoritesView: View {
     var body: some View {
         VStack(alignment: .trailing, spacing: 14) {
             Text("المفضلة")
-                .font(.custom(Theme.fontName, size: 20, weight: .bold))
+                .font(.appFont(20, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.top, 4)
@@ -15,7 +15,7 @@ struct FavoritesView: View {
                 Spacer()
                 VStack(spacing: 12) {
                     Text("لم تُضِف أي مطعم إلى المفضلة بعد")
-                        .font(.custom(Theme.fontName, size: 13))
+                        .font(.appFont(13))
                         .foregroundStyle(Theme.textSecondary)
                     PrimaryButton(title: "تصفح المطاعم", accentColor: store.accentColor) {
                         store.tab = .home
@@ -52,10 +52,10 @@ struct FavoriteRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 6))
             VStack(alignment: .trailing, spacing: 3) {
                 Text(restaurant.name)
-                    .font(.custom(Theme.fontName, size: 14, weight: .medium))
+                    .font(.appFont(14, weight: .medium))
                     .foregroundStyle(Theme.textPrimary)
                 Text("\(restaurant.cuisine) · \(restaurant.area)")
-                    .font(.custom(Theme.fontName, size: 11))
+                    .font(.appFont(11))
                     .foregroundStyle(Theme.textSecondary)
                 StarRatingView(rating: restaurant.rating)
             }

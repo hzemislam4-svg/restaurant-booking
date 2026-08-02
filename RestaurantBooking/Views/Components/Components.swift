@@ -23,7 +23,7 @@ struct FoodPlaceholderImage: View {
             .overlay {
                 if !title.isEmpty {
                     Text(title)
-                        .font(.custom(Theme.fontName, size: 9))
+                        .font(.appFont(9))
                         .foregroundStyle(Theme.textSecondary)
                         .padding(4)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
@@ -59,7 +59,7 @@ struct TagView: View {
 
     var body: some View {
         Text(text)
-            .font(.custom(Theme.fontName, size: 11, relativeTo: .caption))
+            .font(.appFont(11, relativeTo: .caption))
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
             .background {
@@ -89,7 +89,7 @@ struct StarRatingView: View {
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.amber)
             Text(String(format: "%.1f", rating))
-                .font(.custom(Theme.fontName, size: 12, weight: .medium))
+                .font(.appFont(12, weight: .medium))
                 .foregroundStyle(Theme.accent)
         }
     }
@@ -104,7 +104,7 @@ struct ChipView: View {
     var body: some View {
         Button(action: action) {
             Text(label)
-                .font(.custom(Theme.fontName, size: 12, weight: selected ? .medium : .regular))
+                .font(.appFont(12, weight: selected ? .medium : .regular))
                 .foregroundStyle(selected ? accentColor : Theme.textPrimary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 7)
@@ -128,7 +128,7 @@ struct PrimaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.custom(Theme.fontName, size: 15, weight: .bold))
+                .font(.appFont(15, weight: .bold))
                 .foregroundStyle(disabled ? Theme.textMuted : Color.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -149,7 +149,7 @@ struct SecondaryButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.custom(Theme.fontName, size: 15, weight: .bold))
+                .font(.appFont(15, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
@@ -187,11 +187,11 @@ struct InfoRow: View {
     var body: some View {
         HStack {
             Text(label)
-                .font(.custom(Theme.fontName, size: 14))
+                .font(.appFont(14))
                 .foregroundStyle(Theme.textSecondary)
             Spacer()
             Text(value)
-                .font(.custom(Theme.fontName, size: 14, weight: .medium))
+                .font(.appFont(14, weight: .medium))
                 .foregroundStyle(Theme.textPrimary)
         }
     }
@@ -205,7 +205,7 @@ struct MenuRow: View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .font(.custom(Theme.fontName, size: 13))
+                    .font(.appFont(13))
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
                 Image(systemName: "chevron.left")
