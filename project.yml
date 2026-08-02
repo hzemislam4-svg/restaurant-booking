@@ -5,6 +5,10 @@ options:
     iOS: "17.0"
   createIntermediateGroups: true
   xcodeVersion: "16.0"
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 11.0.0
 settings:
   base:
     SWIFT_VERSION: "5.9"
@@ -21,6 +25,13 @@ targets:
       - path: RestaurantBooking
         excludes:
           - Info.plist
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseStorage
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.restaurantbooking.app
@@ -33,3 +44,6 @@ targets:
         MARKETING_VERSION: 1.0
         SUPPORTS_MACCATALYST: NO
         TARGETED_DEVICE_FAMILY: "1"
+        STRIP_SWIFT_SYMBOLS: YES
+        COPY_PHASE_STRIP: YES
+        ENABLE_BITCODE: NO

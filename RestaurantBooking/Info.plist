@@ -51,5 +51,7 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>نستخدم موقعك لعرض المطاعم القريبة على الخريطة.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>نستخدم مكتبة الصور لرفع صور مطعمك لتظهر للزبائن.</string>
 </dict>
 </plist>

@@ -7,11 +7,12 @@ import SwiftUI
 
 struct DiscoverView: View {
     @EnvironmentObject private var store: AppStore
+    @EnvironmentObject private var restaurantRepo: RestaurantRepository
     @State private var searchText = ""
     @State private var selectedCuisine: Cuisine?
 
     private var filteredRestaurants: [Restaurant] {
-        store.restaurants.filter { restaurant in
+        restaurantRepo.restaurants.filter { restaurant in
             let matchesSearch = searchText.isEmpty
                 || restaurant.name.localizedCaseInsensitiveContains(searchText)
                 || restaurant.neighborhood.localizedCaseInsensitiveContains(searchText)
@@ -21,7 +22,7 @@ struct DiscoverView: View {
     }
 
     private var featured: [Restaurant] {
-        store.restaurants.sorted { $0.rating > $1.rating }.prefix(3).map { $0 }
+        restaurantRepo.restaurants.sorted { $0.rating > $1.rating }.prefix(3).map { $0 }
     }
 
     private let columns = [GridItem(.flexible(), spacing: AppSpacing.md), GridItem(.flexible(), spacing: AppSpacing.md)]
@@ -36,11 +37,11 @@ struct DiscoverView: View {
 
                     cuisineFilterRow
 
-                    if searchText.isEmpty && selectedCuisine == nil {
+                    if searchText.isEmpty && selectedCuisine == nil && !restaurantRepo.restaurants.isEmpty {
                         featuredSection
                     }
 
-                    sectionHeader(searchText.isEmpty && selectedCuisine == nil ? "كل المطاعم" : "نتائج البحث")
+                    sectionHeader(searchText.isEmpty && selectedCuisine == nil ? "كل المطاعم" : "النتائج")
 
                     LazyVGrid(columns: columns, spacing: AppSpacing.md) {
                         ForEach(filteredRestaurants) { restaurant in
@@ -67,15 +68,14 @@ struct DiscoverView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .trailing, spacing: 2) {
+        VStack(alignment: .leading, spacing: 2) {
             Text("مساء الخير")
                 .font(.subheadline)
                 .foregroundStyle(AppColor.textSecondary)
-            Text("أين تذهب الليلة؟")
+            Text("وين الليلة؟")
                 .font(.displayTitle)
                 .foregroundStyle(AppColor.textPrimary)
         }
-        .frame(maxWidth: .infinity, alignment: .trailing)
         .padding(.horizontal, AppSpacing.md)
         .padding(.top, AppSpacing.sm)
     }
@@ -155,9 +155,19 @@ struct DiscoverView: View {
             Image(systemName: "fork.knife.circle")
                 .font(.system(size: 40))
                 .foregroundStyle(AppColor.textTertiary)
-            Text("لا توجد مطاعم مطابقة لبحثك")
-                .font(.subheadline)
-                .foregroundStyle(AppColor.textSecondary)
+            if restaurantRepo.restaurants.isEmpty {
+                Text("لا توجد مطاعم بعد")
+                    .font(.headline)
+                Text("كن الأول — سجّل كصاحب مطعم وأضف واحداً.")
+                    .font(.subheadline)
+                    .foregroundStyle(AppColor.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppSpacing.xl)
+            } else {
+                Text("لا توجد مطاعم تطابق بحثك")
+                    .font(.subheadline)
+                    .foregroundStyle(AppColor.textSecondary)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.top, AppSpacing.xl)
@@ -169,8 +179,9 @@ private struct FeaturedCard: View {
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            RestaurantImagePlaceholder(cuisine: restaurant.cuisine, cornerRadius: AppRadius.lg)
+            RestaurantPhotoView(restaurant: restaurant, cornerRadius: AppRadius.lg)
                 .frame(width: 260, height: 150)
+                .clipped()
 
             LinearGradient(
                 colors: [.clear, .black.opacity(0.65)],
@@ -199,4 +210,5 @@ private struct FeaturedCard: View {
 #Preview {
     DiscoverView()
         .environmentObject(AppStore())
+        .environmentObject(RestaurantRepository())
 }

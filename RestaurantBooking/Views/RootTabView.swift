@@ -9,16 +9,16 @@ struct RootTabView: View {
     var body: some View {
         TabView {
             DiscoverView()
-                .tabItem { Label("الاستكشاف", systemImage: "sparkles") }
+                .tabItem { Label("اكتشف", systemImage: "sparkles") }
 
             FavoritesView()
                 .tabItem { Label("المفضلة", systemImage: "heart.fill") }
 
             BookingsView()
-                .tabItem { Label("حجوزاتي", systemImage: "calendar") }
+                .tabItem { Label("الحجوزات", systemImage: "calendar") }
 
             ProfileView()
-                .tabItem { Label("الملف", systemImage: "person.crop.circle") }
+                .tabItem { Label("الملف الشخصي", systemImage: "person.crop.circle") }
         }
         .tint(AppColor.accent)
     }
@@ -27,4 +27,8 @@ struct RootTabView: View {
 #Preview {
     RootTabView()
         .environmentObject(AppStore())
+        .environmentObject(FirebaseAuthService())
+        .environmentObject(SubscriptionStore())
+        .environmentObject(RestaurantRepository())
+        .environmentObject(ReservationRepository())
 }

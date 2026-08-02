@@ -1,11 +1,15 @@
 //
-//  PaywallView.swift
+//  OwnerPaywallView.swift
 //  RestaurantBooking
+//
+//  Subscription screen for restaurant owners. Required before a "My
+//  Restaurant" listing can be created - same mock-purchase pattern as
+//  the diner paywall, no real payment processor involved yet.
 //
 
 import SwiftUI
 
-struct PaywallView: View {
+struct OwnerPaywallView: View {
     @EnvironmentObject private var subscriptions: SubscriptionStore
     @Environment(\.dismiss) private var dismiss
 
@@ -13,10 +17,10 @@ struct PaywallView: View {
     @State private var showSuccess = false
 
     private let benefits = [
-        ("bolt.fill", "أولوية في توفر الطاولات بأفضل المطاعم"),
-        ("percent", "خصومات حصرية للمشتركين على قوائم مختارة"),
-        ("bell.badge.fill", "وصول مبكر لافتتاح المطاعم الجديدة"),
-        ("star.fill", "بدون رسوم على الحجوزات في اللحظة الأخيرة"),
+        ("storefront.fill", "اعرض مطعمك لكل زبون يستخدم التطبيق"),
+        ("photo.on.rectangle.angled", "ارفع صوراً غير محدودة لمكانك وقائمتك"),
+        ("calendar.badge.checkmark", "استقبل وأدر حجوزات الطاولات"),
+        ("chart.bar.fill", "شاهد كم زبوناً يطّلع ويحجز في مطعمك"),
     ]
 
     var body: some View {
@@ -24,21 +28,21 @@ struct PaywallView: View {
             if showSuccess {
                 successView
             } else {
-                paywallForm
+                form
             }
         }
     }
 
-    private var paywallForm: some View {
+    private var form: some View {
         ScrollView {
             VStack(spacing: AppSpacing.lg) {
                 VStack(spacing: 8) {
-                    Image(systemName: "crown.fill")
+                    Image(systemName: "storefront.fill")
                         .font(.system(size: 44))
-                        .foregroundStyle(AppColor.gold)
-                    Text("نادي الطاولة")
+                        .foregroundStyle(AppColor.accent)
+                    Text("شريك المطاعم")
                         .font(.displayTitle)
-                    Text("افتح تجربة الحجز الكاملة")
+                    Text("اعرض مطعمك وابدأ باستقبال الحجوزات")
                         .font(.subheadline)
                         .foregroundStyle(AppColor.textSecondary)
                         .multilineTextAlignment(.center)
@@ -69,11 +73,11 @@ struct PaywallView: View {
 
                 Button {
                     withAnimation {
-                        subscriptions.subscribeDiner(to: selectedPlan)
+                        subscriptions.subscribeOwner(to: selectedPlan)
                         showSuccess = true
                     }
                 } label: {
-                    Text("اشترك الآن — \(DinerPlanPricing.price(for: selectedPlan))")
+                    Text("اشترك — \(OwnerPlanPricing.price(for: selectedPlan))")
                         .font(.headline)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -82,7 +86,7 @@ struct PaywallView: View {
                         .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
                 }
 
-                Text("هذه عملية شراء تجريبية — لا تُخصم أي مبالغ حقيقية ولن يُحتسب أي مبلغ على حسابك.")
+                Text("هذه عملية شراء تجريبية — لا تُعالج أي دفعة حقيقية ولن يُحتسب أي مبلغ على حسابك.")
                     .font(.caption2)
                     .foregroundStyle(AppColor.textTertiary)
                     .multilineTextAlignment(.center)
@@ -105,10 +109,9 @@ struct PaywallView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Text(plan.title)
-                            .font(.subheadline.weight(.semibold))
-                        if let badge = (plan == .yearly ? DinerPlanPricing.yearlyBadge : nil) {
-                            Text(badge)
+                        Text(plan.title).font(.subheadline.weight(.semibold))
+                        if plan == .yearly {
+                            Text(OwnerPlanPricing.yearlyBadge)
                                 .font(.caption2.weight(.semibold))
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)
@@ -117,7 +120,7 @@ struct PaywallView: View {
                                 .clipShape(Capsule())
                         }
                     }
-                    Text(DinerPlanPricing.price(for: plan))
+                    Text(OwnerPlanPricing.price(for: plan))
                         .font(.caption)
                         .foregroundStyle(AppColor.textSecondary)
                 }
@@ -140,19 +143,19 @@ struct PaywallView: View {
     private var successView: some View {
         VStack(spacing: AppSpacing.lg) {
             Spacer()
-            Image(systemName: "crown.fill")
+            Image(systemName: "storefront.fill")
                 .font(.system(size: 64))
-                .foregroundStyle(AppColor.gold)
-            Text("أهلاً بك في نادي الطاولة")
+                .foregroundStyle(AppColor.accent)
+            Text("أنت شريك الآن")
                 .font(.title2.bold())
-            Text("اشتراكك \(selectedPlan.title) مفعّل الآن.")
+            Text("لنضيف مطعمك.")
                 .font(.subheadline)
                 .foregroundStyle(AppColor.textSecondary)
             Spacer()
             Button {
                 dismiss()
             } label: {
-                Text("تم")
+                Text("متابعة")
                     .font(.headline)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -167,6 +170,6 @@ struct PaywallView: View {
 }
 
 #Preview {
-    PaywallView()
+    OwnerPaywallView()
         .environmentObject(SubscriptionStore())
 }

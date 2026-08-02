@@ -7,16 +7,17 @@ import SwiftUI
 
 struct FavoritesView: View {
     @EnvironmentObject private var store: AppStore
+    @EnvironmentObject private var restaurantRepo: RestaurantRepository
     private let columns = [GridItem(.flexible(), spacing: AppSpacing.md), GridItem(.flexible(), spacing: AppSpacing.md)]
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                if store.favoriteRestaurants.isEmpty {
+                if store.favoriteRestaurants(from: restaurantRepo.restaurants).isEmpty {
                     emptyState
                 } else {
                     LazyVGrid(columns: columns, spacing: AppSpacing.md) {
-                        ForEach(store.favoriteRestaurants) { restaurant in
+                        ForEach(store.favoriteRestaurants(from: restaurantRepo.restaurants)) { restaurant in
                             NavigationLink(value: restaurant) {
                                 RestaurantCard(restaurant: restaurant)
                             }
@@ -41,7 +42,7 @@ struct FavoritesView: View {
                 .foregroundStyle(AppColor.textTertiary)
             Text("لا توجد مفضلات بعد")
                 .font(.headline)
-            Text("اضغط على القلب في أي مطعم لحفظه هنا.")
+            Text("اضغط القلب في أي مطعم لحفظه هنا.")
                 .font(.subheadline)
                 .foregroundStyle(AppColor.textSecondary)
                 .multilineTextAlignment(.center)
@@ -54,4 +55,5 @@ struct FavoritesView: View {
 #Preview {
     FavoritesView()
         .environmentObject(AppStore())
+        .environmentObject(RestaurantRepository())
 }

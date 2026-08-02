@@ -6,10 +6,12 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject private var store: AppStore
-    @EnvironmentObject private var auth: AuthStore
+    @EnvironmentObject private var favorites: AppStore
+    @EnvironmentObject private var auth: FirebaseAuthService
     @EnvironmentObject private var subscriptions: SubscriptionStore
-    @State private var showPaywall = false
+    @EnvironmentObject private var restaurantRepo: RestaurantRepository
+    @EnvironmentObject private var reservationRepo: ReservationRepository
+    @State private var showDinerPaywall = false
 
     var body: some View {
         NavigationStack {
@@ -25,9 +27,9 @@ struct ProfileView: View {
                                     .foregroundStyle(AppColor.accent)
                             )
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(auth.currentDisplayName)
+                            Text(auth.currentUser?.displayName ?? "ضيف")
                                 .font(.headline)
-                            if subscriptions.isSubscribed, let plan = subscriptions.activePlan {
+                            if subscriptions.isDinerSubscribed, let plan = subscriptions.dinerPlan {
                                 Label("نادي الطاولة · \(plan.title)", systemImage: "crown.fill")
                                     .font(.caption)
                                     .foregroundStyle(AppColor.gold)
@@ -41,64 +43,80 @@ struct ProfileView: View {
                     .padding(.vertical, 6)
                 }
 
-                if !subscriptions.isSubscribed {
+                if !subscriptions.isDinerSubscribed {
                     Section {
-                        Button {
-                            showPaywall = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "crown.fill")
-                                    .foregroundStyle(AppColor.gold)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("الترقية إلى نادي الطاولة")
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(AppColor.textPrimary)
-                                    Text("طاولات ذات أولوية، خصومات للأعضاء والمزيد")
-                                        .font(.caption)
-                                        .foregroundStyle(AppColor.textSecondary)
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.left")
-                                    .font(.caption)
-                                    .foregroundStyle(AppColor.textTertiary)
-                            }
-                        }
+                        upgradeRow(
+                            icon: "crown.fill",
+                            title: "الترقية إلى نادي الطاولة",
+                            subtitle: "طاولات ذات أولوية، خصومات للأعضاء والمزيد"
+                        ) { showDinerPaywall = true }
                     }
                 } else {
                     Section("العضوية") {
                         HStack {
                             Text("الخطة")
                             Spacer()
-                            Text(subscriptions.activePlan?.title ?? "—")
+                            Text(subscriptions.dinerPlan?.title ?? "—")
                                 .foregroundStyle(AppColor.textSecondary)
                         }
                         Button(role: .destructive) {
-                            subscriptions.cancelSubscription()
+                            subscriptions.cancelDinerSubscription()
                         } label: {
                             Text("إلغاء العضوية")
                         }
                     }
                 }
 
+                Section("لأصحاب المطاعم") {
+                    NavigationLink {
+                        MyRestaurantView()
+                    } label: {
+                        Label(
+                            subscriptions.isOwnerSubscribed ? "مطعمي" : "كن شريكاً للمطاعم",
+                            systemImage: "storefront"
+                        )
+                    }
+                }
+
                 Section("النشاط") {
-                    statRow(icon: "heart.fill", label: "المطاعم المفضلة", value: "\(store.favoriteRestaurants.count)")
-                    statRow(icon: "calendar", label: "الحجوزات القادمة", value: "\(store.upcomingReservations.count)")
+                    statRow(icon: "heart.fill", label: "المطاعم المفضلة", value: "\(favorites.favoriteRestaurants(from: restaurantRepo.restaurants).count)")
+                    statRow(icon: "calendar", label: "الحجوزات القادمة", value: "\(reservationRepo.upcomingReservations.count)")
                 }
 
                 Section("التفضيلات") {
-                    Label("الإشعارات", systemImage: "bell")
+                    NavigationLink {
+                        NotificationsSettingsView()
+                    } label: {
+                        Label("الإشعارات", systemImage: "bell")
+                    }
                     NavigationLink {
                         PaymentMethodsView()
                     } label: {
                         Label("طرق الدفع", systemImage: "creditcard")
                     }
-                    Label("اللغة", systemImage: "globe")
+                    NavigationLink {
+                        LanguageView()
+                    } label: {
+                        Label("اللغة", systemImage: "globe")
+                    }
                 }
 
                 Section("الدعم") {
-                    Label("مركز المساعدة", systemImage: "questionmark.circle")
-                    Label("تواصل معنا", systemImage: "envelope")
-                    Label("حول التطبيق", systemImage: "info.circle")
+                    NavigationLink {
+                        HelpCenterView()
+                    } label: {
+                        Label("مركز المساعدة", systemImage: "questionmark.circle")
+                    }
+                    NavigationLink {
+                        ContactUsView()
+                    } label: {
+                        Label("تواصل معنا", systemImage: "envelope")
+                    }
+                    NavigationLink {
+                        AboutView()
+                    } label: {
+                        Label("حول التطبيق", systemImage: "info.circle")
+                    }
                 }
 
                 Section {
@@ -119,16 +137,37 @@ struct ProfileView: View {
                 .listRowBackground(Color.clear)
             }
             .navigationTitle("الملف الشخصي")
-            .sheet(isPresented: $showPaywall) {
+            .sheet(isPresented: $showDinerPaywall) {
                 PaywallView()
             }
         }
     }
 
     private var initials: String {
-        let parts = auth.currentDisplayName.split(separator: " ")
+        let name = auth.currentUser?.displayName ?? "ضيف"
+        let parts = name.split(separator: " ")
         let letters = parts.prefix(2).compactMap { $0.first }
         return String(letters).uppercased()
+    }
+
+    private func upgradeRow(icon: String, title: String, subtitle: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon).foregroundStyle(AppColor.gold)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(AppColor.textPrimary)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(AppColor.textSecondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundStyle(AppColor.textTertiary)
+            }
+        }
     }
 
     private func statRow(icon: String, label: String, value: String) -> some View {
@@ -144,6 +183,8 @@ struct ProfileView: View {
 #Preview {
     ProfileView()
         .environmentObject(AppStore())
-        .environmentObject(AuthStore())
+        .environmentObject(FirebaseAuthService())
         .environmentObject(SubscriptionStore())
+        .environmentObject(RestaurantRepository())
+        .environmentObject(ReservationRepository())
 }

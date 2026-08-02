@@ -2,21 +2,38 @@
 //  BookingView.swift
 //  RestaurantBooking
 //
+//  Booking sheet - date/time/party size + contact details, and a
+//  required confirmation step so a reservation isn't just one tap of
+//  "maybe". This is the free alternative to SMS verification: a real
+//  name, a real phone number, and an explicit checkbox commitment,
+//  all stored with the reservation so the restaurant can follow up.
+//
 
 import SwiftUI
 
 struct BookingView: View {
-    @EnvironmentObject private var store: AppStore
+    @EnvironmentObject private var auth: FirebaseAuthService
+    @EnvironmentObject private var reservationRepo: ReservationRepository
     @Environment(\.dismiss) private var dismiss
 
     let restaurant: Restaurant
 
     @State private var selectedDate = Date().addingTimeInterval(60 * 60 * 2)
     @State private var partySize = 2
+    @State private var contactName = ""
+    @State private var contactPhone = ""
     @State private var specialRequest = ""
+    @State private var confirmedIntent = false
+
+    @State private var isSaving = false
+    @State private var errorMessage: String?
     @State private var showConfirmation = false
 
     private let partySizes = Array(1...10)
+
+    private var canSubmit: Bool {
+        !contactName.isEmpty && !contactPhone.isEmpty && confirmedIntent
+    }
 
     var body: some View {
         NavigationStack {
@@ -49,31 +66,61 @@ struct BookingView: View {
                 DatePicker("الوقت", selection: $selectedDate, displayedComponents: .hourAndMinute)
             }
 
-            Section("عدد الأشخاص") {
+            Section("حجم المجموعة") {
                 Picker("الضيوف", selection: $partySize) {
                     ForEach(partySizes, id: \.self) { size in
-                        Text(size == 1 ? "ضيف واحد" : "\(size) ضيوف").tag(size)
+                        Text("\(size) \(size == 1 ? "ضيف" : "ضيوف")").tag(size)
                     }
                 }
                 .pickerStyle(.menu)
             }
 
+            Section("بيانات التواصل") {
+                TextField("الاسم الكامل", text: $contactName)
+                TextField("رقم الهاتف", text: $contactPhone)
+                    .keyboardType(.phonePad)
+                Text("قد يتصل المطعم لتأكيد طاولتك.")
+                    .font(.caption2)
+                    .foregroundStyle(AppColor.textTertiary)
+            }
+
             Section("طلب خاص (اختياري)") {
-                TextField("منظر النافذة، عيد ميلاد، حساسية...", text: $specialRequest, axis: .vertical)
+                TextField("نافذة، عيد ميلاد، حساسية...", text: $specialRequest, axis: .vertical)
                     .lineLimit(3, reservesSpace: true)
             }
 
             Section {
-                Button {
-                    confirmBooking()
-                } label: {
-                    Text("تأكيد الحجز")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 6)
+                Toggle(isOn: $confirmedIntent) {
+                    Text("أؤكد أنني أنوي الحضور لهذا الحجز وأتفهم أن المطعم قد يتواصل معي للتأكيد.")
+                        .font(.footnote)
                 }
-                .listRowBackground(AppColor.accent)
-                .foregroundStyle(.white)
+            }
+
+            if let errorMessage {
+                Section {
+                    Text(errorMessage)
+                        .font(.footnote)
+                        .foregroundStyle(AppColor.danger)
+                }
+            }
+
+            Section {
+                Button {
+                    Task { await confirmBooking() }
+                } label: {
+                    if isSaving {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Text("تأكيد الحجز")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                    }
+                }
+                .disabled(!canSubmit || isSaving)
+                .listRowBackground(canSubmit ? AppColor.accent : AppColor.secondaryBackground)
+                .foregroundStyle(canSubmit ? .white : AppColor.textTertiary)
             }
         }
         .navigationTitle("احجز طاولة")
@@ -104,7 +151,8 @@ struct BookingView: View {
             VStack(spacing: 12) {
                 summaryRow(icon: "calendar", text: selectedDate.formatted(date: .abbreviated, time: .omitted))
                 summaryRow(icon: "clock", text: selectedDate.formatted(date: .omitted, time: .shortened))
-                summaryRow(icon: "person.2", text: partySize == 1 ? "ضيف واحد" : "\(partySize) ضيوف")
+                summaryRow(icon: "person.2", text: "\(partySize) \(partySize == 1 ? "ضيف" : "ضيوف")")
+                summaryRow(icon: "phone", text: contactPhone)
             }
             .padding(AppSpacing.md)
             .background(AppColor.cardBackground)
@@ -140,22 +188,36 @@ struct BookingView: View {
         }
     }
 
-    private func confirmBooking() {
+    private func confirmBooking() async {
+        guard let customerId = auth.currentUser?.uid else { return }
+        isSaving = true
+        errorMessage = nil
+
         let reservation = Reservation(
             restaurantId: restaurant.id,
             restaurantName: restaurant.name,
+            customerId: customerId,
             date: selectedDate,
             partySize: partySize,
-            specialRequest: specialRequest
+            specialRequest: specialRequest,
+            contactName: contactName,
+            contactPhone: contactPhone,
+            confirmedIntent: confirmedIntent
         )
-        store.addReservation(reservation)
-        withAnimation {
-            showConfirmation = true
+
+        do {
+            try await reservationRepo.addReservation(reservation)
+            isSaving = false
+            withAnimation { showConfirmation = true }
+        } catch {
+            isSaving = false
+            errorMessage = error.localizedDescription
         }
     }
 }
 
 #Preview {
-    BookingView(restaurant: SampleData.restaurants[0])
-        .environmentObject(AppStore())
+    BookingView(restaurant: PreviewFixtures.restaurant)
+        .environmentObject(FirebaseAuthService())
+        .environmentObject(ReservationRepository())
 }

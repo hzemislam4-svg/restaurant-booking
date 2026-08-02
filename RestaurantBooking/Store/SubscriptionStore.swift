@@ -2,15 +2,16 @@
 //  SubscriptionStore.swift
 //  RestaurantBooking
 //
-//  Mock subscription + saved cards. Pressing "Subscribe" flips a local
-//  flag and saves a fake "receipt" - it does NOT contact Apple, Stripe,
-//  or any payment processor, and no real money moves. This matches
-//  what you asked for: the paywall should look and feel real, but not
-//  be wired to a real payment gateway yet.
+//  Mock subscriptions for BOTH sides of the app:
+//   - Diner plan ("Table Club") - perks for people booking tables
+//   - Owner plan ("Restaurant Partner") - required before a restaurant
+//     owner can publish a listing
 //
-//  When you're ready to take real payments, this is the file to
-//  replace with RevenueCat/StoreKit - the UI in PaywallView.swift and
-//  PaymentMethodsView.swift can stay almost exactly as-is.
+//  Still a mock purchase flow - no real payment processor is
+//  contacted, matching what you asked for earlier. When you're ready
+//  to charge real money, this is the file to replace with
+//  RevenueCat/StoreKit; the paywalls in PaywallView.swift and
+//  OwnerPaywallView.swift can stay almost exactly as they are.
 //
 
 import Foundation
@@ -37,58 +38,77 @@ enum SubscriptionPlan: String, CaseIterable, Identifiable {
     case yearly
 
     var id: String { rawValue }
+    var title: String { self == .monthly ? "شهري" : "سنوي" }
+}
 
-    var title: String {
-        switch self {
-        case .monthly: return "شهري"
-        case .yearly: return "سنوي"
-        }
+enum DinerPlanPricing {
+    static func price(for plan: SubscriptionPlan) -> String {
+        plan == .monthly ? "$6.99 / شهرياً" : "$59.99 / سنوياً"
     }
+    static let yearlyBadge = "الأفضل قيمة — وفّر 28%"
+}
 
-    var price: String {
-        switch self {
-        case .monthly: return "$6.99 / شهرياً"
-        case .yearly: return "$59.99 / سنوياً"
-        }
+enum OwnerPlanPricing {
+    static func price(for plan: SubscriptionPlan) -> String {
+        plan == .monthly ? "$24.99 / شهرياً" : "$249.99 / سنوياً"
     }
-
-    var badge: String? {
-        self == .yearly ? "الأفضل قيمة — وفّر 28%" : nil
-    }
+    static let yearlyBadge = "الأفضل قيمة — شهران مجاناً"
 }
 
 @MainActor
 final class SubscriptionStore: ObservableObject {
-    @Published private(set) var isSubscribed: Bool = false
-    @Published private(set) var activePlan: SubscriptionPlan?
+    @Published private(set) var isDinerSubscribed = false
+    @Published private(set) var dinerPlan: SubscriptionPlan?
+
+    @Published private(set) var isOwnerSubscribed = false
+    @Published private(set) var ownerPlan: SubscriptionPlan?
+
     @Published private(set) var savedCards: [SavedCard] = []
 
-    private let subscribedKey = "isSubscribedPro"
-    private let planKey = "activeSubscriptionPlan"
+    private let dinerKey = "isDinerSubscribed"
+    private let dinerPlanKey = "dinerPlan"
+    private let ownerKey = "isOwnerSubscribed"
+    private let ownerPlanKey = "ownerPlan"
     private let cardsKey = "savedPaymentCards"
 
     init() {
-        isSubscribed = UserDefaults.standard.bool(forKey: subscribedKey)
-        if let rawPlan = UserDefaults.standard.string(forKey: planKey) {
-            activePlan = SubscriptionPlan(rawValue: rawPlan)
+        isDinerSubscribed = UserDefaults.standard.bool(forKey: dinerKey)
+        if let raw = UserDefaults.standard.string(forKey: dinerPlanKey) {
+            dinerPlan = SubscriptionPlan(rawValue: raw)
+        }
+        isOwnerSubscribed = UserDefaults.standard.bool(forKey: ownerKey)
+        if let raw = UserDefaults.standard.string(forKey: ownerPlanKey) {
+            ownerPlan = SubscriptionPlan(rawValue: raw)
         }
         loadCards()
     }
 
-    /// Simulates a successful purchase. Real integration point for
-    /// StoreKit/RevenueCat later.
-    func subscribe(to plan: SubscriptionPlan) {
-        isSubscribed = true
-        activePlan = plan
-        UserDefaults.standard.set(true, forKey: subscribedKey)
-        UserDefaults.standard.set(plan.rawValue, forKey: planKey)
+    func subscribeDiner(to plan: SubscriptionPlan) {
+        isDinerSubscribed = true
+        dinerPlan = plan
+        UserDefaults.standard.set(true, forKey: dinerKey)
+        UserDefaults.standard.set(plan.rawValue, forKey: dinerPlanKey)
     }
 
-    func cancelSubscription() {
-        isSubscribed = false
-        activePlan = nil
-        UserDefaults.standard.set(false, forKey: subscribedKey)
-        UserDefaults.standard.removeObject(forKey: planKey)
+    func cancelDinerSubscription() {
+        isDinerSubscribed = false
+        dinerPlan = nil
+        UserDefaults.standard.set(false, forKey: dinerKey)
+        UserDefaults.standard.removeObject(forKey: dinerPlanKey)
+    }
+
+    func subscribeOwner(to plan: SubscriptionPlan) {
+        isOwnerSubscribed = true
+        ownerPlan = plan
+        UserDefaults.standard.set(true, forKey: ownerKey)
+        UserDefaults.standard.set(plan.rawValue, forKey: ownerPlanKey)
+    }
+
+    func cancelOwnerSubscription() {
+        isOwnerSubscribed = false
+        ownerPlan = nil
+        UserDefaults.standard.set(false, forKey: ownerKey)
+        UserDefaults.standard.removeObject(forKey: ownerPlanKey)
     }
 
     // MARK: - Cards (UI only - never sent anywhere, no real validation)
@@ -97,9 +117,7 @@ final class SubscriptionStore: ObservableObject {
         let digitsOnly = cardNumber.filter(\.isNumber)
         let last4 = String(digitsOnly.suffix(4))
         let brand = Self.detectBrand(from: digitsOnly)
-
-        let card = SavedCard(cardholderName: cardholderName, last4: last4, expiry: expiry, brand: brand)
-        savedCards.append(card)
+        savedCards.append(SavedCard(cardholderName: cardholderName, last4: last4, expiry: expiry, brand: brand))
         saveCards()
     }
 

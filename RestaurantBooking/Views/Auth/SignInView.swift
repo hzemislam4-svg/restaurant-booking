@@ -6,8 +6,8 @@
 import SwiftUI
 
 struct SignInView: View {
-    @EnvironmentObject private var auth: AuthStore
-    @State private var username = ""
+    @EnvironmentObject private var auth: FirebaseAuthService
+    @State private var email = ""
     @State private var password = ""
     @State private var goToSignUp = false
 
@@ -28,7 +28,8 @@ struct SignInView: View {
                 }
 
                 VStack(spacing: AppSpacing.sm) {
-                    AppTextField(placeholder: "اسم المستخدم", text: $username, autocapitalize: false)
+                    AppTextField(placeholder: "البريد الإلكتروني", text: $email, autocapitalize: false)
+                        .keyboardType(.emailAddress)
                     AppSecureField(placeholder: "كلمة المرور", text: $password)
                 }
 
@@ -40,18 +41,22 @@ struct SignInView: View {
                 }
 
                 Button {
-                    _ = auth.logIn(username: username, password: password)
+                    Task { await auth.logIn(email: email, password: password) }
                 } label: {
-                    Text("تسجيل الدخول")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(AppColor.accent)
-                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                    if auth.isLoading {
+                        ProgressView().tint(.white)
+                    } else {
+                        Text("تسجيل الدخول")
+                    }
                 }
-                .disabled(username.isEmpty || password.isEmpty)
-                .opacity(username.isEmpty || password.isEmpty ? 0.5 : 1)
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(AppColor.accent)
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                .disabled(email.isEmpty || password.isEmpty || auth.isLoading)
+                .opacity(email.isEmpty || password.isEmpty ? 0.5 : 1)
 
                 Spacer()
 
@@ -112,5 +117,5 @@ struct AppSecureField: View {
 
 #Preview {
     SignInView()
-        .environmentObject(AuthStore())
+        .environmentObject(FirebaseAuthService())
 }

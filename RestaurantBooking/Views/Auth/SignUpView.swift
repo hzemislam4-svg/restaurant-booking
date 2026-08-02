@@ -6,13 +6,14 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @EnvironmentObject private var auth: AuthStore
+    @EnvironmentObject private var auth: FirebaseAuthService
     @Environment(\.dismiss) private var dismiss
 
     @State private var displayName = ""
-    @State private var username = ""
+    @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
+    @State private var role: UserRole = .diner
 
     private var passwordsMatch: Bool { password == confirmPassword }
 
@@ -29,9 +30,16 @@ struct SignUpView: View {
                 .padding(.top, AppSpacing.lg)
 
                 VStack(spacing: AppSpacing.sm) {
+                    Picker("أنا...", selection: $role) {
+                        Text("زبون").tag(UserRole.diner)
+                        Text("صاحب مطعم").tag(UserRole.owner)
+                    }
+                    .pickerStyle(.segmented)
+
                     AppTextField(placeholder: "الاسم الكامل", text: $displayName)
-                    AppTextField(placeholder: "اسم المستخدم", text: $username, autocapitalize: false)
-                    AppSecureField(placeholder: "كلمة المرور", text: $password)
+                    AppTextField(placeholder: "البريد الإلكتروني", text: $email, autocapitalize: false)
+                        .keyboardType(.emailAddress)
+                    AppSecureField(placeholder: "كلمة المرور (6 أحرف على الأقل)", text: $password)
                     AppSecureField(placeholder: "تأكيد كلمة المرور", text: $confirmPassword)
                 }
 
@@ -49,19 +57,24 @@ struct SignUpView: View {
                 }
 
                 Button {
-                    if auth.signUp(displayName: displayName, username: username, password: password) {
-                        dismiss()
+                    Task {
+                        await auth.signUp(displayName: displayName, email: email, password: password, role: role)
+                        if auth.isLoggedIn { dismiss() }
                     }
                 } label: {
-                    Text("إنشاء الحساب")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(AppColor.accent)
-                        .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                    if auth.isLoading {
+                        ProgressView().tint(.white)
+                    } else {
+                        Text("إنشاء الحساب")
+                    }
                 }
-                .disabled(!canSubmit)
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(AppColor.accent)
+                .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
+                .disabled(!canSubmit || auth.isLoading)
                 .opacity(canSubmit ? 1 : 0.5)
             }
             .padding(.horizontal, AppSpacing.lg)
@@ -73,7 +86,7 @@ struct SignUpView: View {
     }
 
     private var canSubmit: Bool {
-        !displayName.isEmpty && !username.isEmpty && !password.isEmpty && passwordsMatch
+        !displayName.isEmpty && !email.isEmpty && !password.isEmpty && passwordsMatch
     }
 }
 
@@ -81,5 +94,5 @@ struct SignUpView: View {
     NavigationStack {
         SignUpView()
     }
-    .environmentObject(AuthStore())
+    .environmentObject(FirebaseAuthService())
 }

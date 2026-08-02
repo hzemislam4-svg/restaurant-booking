@@ -12,8 +12,9 @@ struct RestaurantCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.sm) {
             ZStack(alignment: .topTrailing) {
-                RestaurantImagePlaceholder(cuisine: restaurant.cuisine)
+                RestaurantPhotoView(restaurant: restaurant, cornerRadius: AppRadius.lg)
                     .frame(height: 160)
+                    .clipped()
 
                 Button {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {

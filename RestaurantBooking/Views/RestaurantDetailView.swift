@@ -50,7 +50,7 @@ struct RestaurantDetailView: View {
 
     private var heroHeader: some View {
         ZStack(alignment: .topTrailing) {
-            RestaurantImagePlaceholder(cuisine: restaurant.cuisine, cornerRadius: 0)
+            RestaurantPhotoView(restaurant: restaurant, cornerRadius: 0)
                 .frame(height: 260)
 
             Button {
@@ -143,7 +143,7 @@ struct RestaurantDetailView: View {
             }
             .frame(height: 180)
             .clipShape(RoundedRectangle(cornerRadius: AppRadius.md, style: .continuous))
-            .disabled(true) // معاينة فقط؛ "الاتجاهات" تفتح تطبيق الخرائط الحقيقي
+            .disabled(true) // معاينة فقط؛ اضغط "الاتجاهات" لفتح خرائط Apple
             .overlay(alignment: .bottomTrailing) {
                 Button {
                     openInMaps()
@@ -233,7 +233,9 @@ struct FlowLayout: Layout {
 
 #Preview {
     NavigationStack {
-        RestaurantDetailView(restaurant: SampleData.restaurants[0])
+        RestaurantDetailView(restaurant: PreviewFixtures.restaurant)
     }
     .environmentObject(AppStore())
+    .environmentObject(FirebaseAuthService())
+    .environmentObject(ReservationRepository())
 }
