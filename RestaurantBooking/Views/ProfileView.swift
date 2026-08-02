@@ -7,6 +7,9 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject private var store: AppStore
+    @EnvironmentObject private var auth: AuthStore
+    @EnvironmentObject private var subscriptions: SubscriptionStore
+    @State private var showPaywall = false
 
     var body: some View {
         NavigationStack {
@@ -17,19 +20,64 @@ struct ProfileView: View {
                             .fill(AppColor.accentSoft)
                             .frame(width: 56, height: 56)
                             .overlay(
-                                Image(systemName: "person.fill")
+                                Text(initials)
+                                    .font(.headline)
                                     .foregroundStyle(AppColor.accent)
-                                    .font(.system(size: 22))
                             )
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("ضيف")
+                            Text(auth.currentDisplayName)
                                 .font(.headline)
-                            Text("سجّل الدخول لمزامنة حجوزاتك")
-                                .font(.caption)
-                                .foregroundStyle(AppColor.textSecondary)
+                            if subscriptions.isSubscribed, let plan = subscriptions.activePlan {
+                                Label("نادي الطاولة · \(plan.title)", systemImage: "crown.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(AppColor.gold)
+                            } else {
+                                Text("حساب مجاني")
+                                    .font(.caption)
+                                    .foregroundStyle(AppColor.textSecondary)
+                            }
                         }
                     }
                     .padding(.vertical, 6)
+                }
+
+                if !subscriptions.isSubscribed {
+                    Section {
+                        Button {
+                            showPaywall = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "crown.fill")
+                                    .foregroundStyle(AppColor.gold)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("الترقية إلى نادي الطاولة")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(AppColor.textPrimary)
+                                    Text("طاولات ذات أولوية، خصومات للأعضاء والمزيد")
+                                        .font(.caption)
+                                        .foregroundStyle(AppColor.textSecondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.left")
+                                    .font(.caption)
+                                    .foregroundStyle(AppColor.textTertiary)
+                            }
+                        }
+                    }
+                } else {
+                    Section("العضوية") {
+                        HStack {
+                            Text("الخطة")
+                            Spacer()
+                            Text(subscriptions.activePlan?.title ?? "—")
+                                .foregroundStyle(AppColor.textSecondary)
+                        }
+                        Button(role: .destructive) {
+                            subscriptions.cancelSubscription()
+                        } label: {
+                            Text("إلغاء العضوية")
+                        }
+                    }
                 }
 
                 Section("النشاط") {
@@ -39,7 +87,11 @@ struct ProfileView: View {
 
                 Section("التفضيلات") {
                     Label("الإشعارات", systemImage: "bell")
-                    Label("طرق الدفع", systemImage: "creditcard")
+                    NavigationLink {
+                        PaymentMethodsView()
+                    } label: {
+                        Label("طرق الدفع", systemImage: "creditcard")
+                    }
                     Label("اللغة", systemImage: "globe")
                 }
 
@@ -47,6 +99,15 @@ struct ProfileView: View {
                     Label("مركز المساعدة", systemImage: "questionmark.circle")
                     Label("تواصل معنا", systemImage: "envelope")
                     Label("حول التطبيق", systemImage: "info.circle")
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        auth.logOut()
+                    } label: {
+                        Text("تسجيل الخروج")
+                            .frame(maxWidth: .infinity)
+                    }
                 }
 
                 Section {
@@ -58,7 +119,16 @@ struct ProfileView: View {
                 .listRowBackground(Color.clear)
             }
             .navigationTitle("الملف الشخصي")
+            .sheet(isPresented: $showPaywall) {
+                PaywallView()
+            }
         }
+    }
+
+    private var initials: String {
+        let parts = auth.currentDisplayName.split(separator: " ")
+        let letters = parts.prefix(2).compactMap { $0.first }
+        return String(letters).uppercased()
     }
 
     private func statRow(icon: String, label: String, value: String) -> some View {
@@ -74,4 +144,6 @@ struct ProfileView: View {
 #Preview {
     ProfileView()
         .environmentObject(AppStore())
+        .environmentObject(AuthStore())
+        .environmentObject(SubscriptionStore())
 }

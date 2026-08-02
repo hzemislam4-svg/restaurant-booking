@@ -10,6 +10,8 @@ import SwiftUI
 @main
 struct RestaurantBookingApp: App {
     @StateObject private var store = AppStore()
+    @StateObject private var auth = AuthStore()
+    @StateObject private var subscriptions = SubscriptionStore()
 
     init() {
         let appearance = UITabBarAppearance()
@@ -20,10 +22,19 @@ struct RestaurantBookingApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootTabView()
-                .environmentObject(store)
-                .environment(\.layoutDirection, .rightToLeft)
-                .preferredColorScheme(.dark)
+            Group {
+                if auth.isLoggedIn {
+                    RootTabView()
+                } else {
+                    SignInView()
+                }
+            }
+            .environmentObject(store)
+            .environmentObject(auth)
+            .environmentObject(subscriptions)
+            .environment(\.layoutDirection, .rightToLeft)
+            .preferredColorScheme(.dark)
+            .animation(.easeInOut, value: auth.isLoggedIn)
         }
     }
 }
