@@ -25,17 +25,12 @@ targets:
       - path: RestaurantBooking
         excludes:
           - Info.plist
-          - GoogleService-Info.plist
     preBuildScripts:
       - name: Validate Firebase config
         script: |
           if [ ! -f "$SRCROOT/RestaurantBooking/GoogleService-Info.plist" ]; then
             echo "warning: GoogleService-Info.plist is missing. FirebaseApp.configure() will crash at launch."
           fi
-    buildPhases:
-      - type: resources
-        files:
-          - RestaurantBooking/GoogleService-Info.plist
     dependencies:
       - package: Firebase
         product: FirebaseAuth
