@@ -17,8 +17,14 @@ struct RestaurantBookingApp: App {
     @StateObject private var restaurantRepo = RestaurantRepository()
     @StateObject private var reservationRepo = ReservationRepository()
 
+    private var firebaseReady: Bool {
+        Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil
+    }
+
     init() {
-        FirebaseApp.configure()
+        if firebaseReady {
+            FirebaseApp.configure()
+        }
         let appearance = UITabBarAppearance()
         appearance.configureWithTransparentBackground()
         UITabBar.appearance().standardAppearance = appearance
@@ -28,7 +34,9 @@ struct RestaurantBookingApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if auth.isLoggedIn {
+                if !firebaseReady {
+                    SetupRequiredView()
+                } else if auth.isLoggedIn {
                     RootTabView()
                         .onAppear {
                             if let uid = auth.currentUser?.uid {
